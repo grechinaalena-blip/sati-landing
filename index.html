@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sati — 14 дней осознанного питания</title>
+  <meta name="description" content="Бесплатный 14-дневный тренажёр осознанного питания. Без калорий, без стыда — только осознанность.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0F1212;
+      --surface: #1A1F1F;
+      --primary: #29D6B6;
+      --primary-rgb: 41, 214, 182;
+      --accent: #FF6B35;
+      --accent-rgb: 255, 107, 53;
+      --muted: #8C9696;
+      --foreground: #FFFFFF;
+      --glow-purple: rgba(120, 60, 120, 0.5);
+      --glow-teal: rgba(41, 214, 182, 0.3);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--foreground);
+      font-family: 'Manrope', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      touch-action: pan-y;
+    }
+
+    /* ── Carousel Container ── */
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .slides-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+    }
+
+    .slides-track.dragging {
+      transition: none;
+    }
+
+    /* ── Slide Base ── */
+    .slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 28px 120px;
+      overflow: hidden;
+    }
+
+    /* ── Ethereal Background ── */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 0;
+    }
+
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .glow-1 {
+      width: 300px;
+      height: 300px;
+      top: -60px;
+      right: -80px;
+      background: radial-gradient(circle, rgba(120,60,120,0.6) 0%, rgba(80,40,100,0.2) 60%, transparent 100%);
+      opacity: 0.5;
+      animation: float-1 6s ease-in-out infinite;
+    }
+
+    .glow-2 {
+      width: 250px;
+      height: 250px;
+      bottom: -40px;
+      left: -60px;
+      background: radial-gradient(circle, rgba(60,30,80,0.7) 0%, rgba(40,20,60,0.2) 60%, transparent 100%);
+      opacity: 0.4;
+      animation: float-2 7s ease-in-out infinite;
+    }
+
+    .glow-3 {
+      width: 200px;
+      height: 200px;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(var(--primary-rgb),0.35) 0%, transparent 70%);
+      opacity: 0.2;
+      animation: float-3 5s ease-in-out infinite;
+    }
+
+    /* ── Slide Content ── */
+    .slide-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      gap: 20px;
+      animation: fadeSlideUp 0.6s ease-out both;
+    }
+
+    .slide.active .slide-content {
+      animation: fadeSlideUp 0.6s ease-out both;
+    }
+
+    .emoji-large {
+      font-size: 56px;
+      line-height: 1;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 0 30px rgba(var(--primary-rgb), 0.3));
+    }
+
+    .slide-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--primary);
+      opacity: 0.9;
+    }
+
+    .slide-title {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .slide-title .accent {
+      color: var(--primary);
+    }
+
+    .slide-title .warm {
+      color: var(--accent);
+    }
+
+    .slide-text {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 320px;
+    }
+
+    .slide-text strong {
+      color: var(--foreground);
+      font-weight: 600;
+    }
+
+    /* ── Glass Panel ── */
+    .glass {
+      background: rgba(26, 31, 31, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+    }
+
+    .glass-sm {
+      padding: 16px 20px;
+      border-radius: 16px;
+    }
+
+    /* ── Feature Cards ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .feature-card {
+      background: rgba(26, 31, 31, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(var(--primary-rgb), 0.2);
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.08);
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .feature-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .feature-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── Timeline ── */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .timeline-marker {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .timeline-marker.morning { background: rgba(var(--primary-rgb), 0.15); }
+    .timeline-marker.pause { background: rgba(120, 60, 120, 0.2); }
+    .timeline-marker.evening { background: rgba(var(--accent-rgb), 0.15); }
+
+    .timeline-text h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .timeline-text p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── Phase Cards ── */
+    .phases {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .phase-card {
+      background: rgba(26, 31, 31, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .phase-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .phase-num.p1 { background: rgba(var(--primary-rgb), 0.15); color: var(--primary); }
+    .phase-num.p2 { background: rgba(120, 60, 120, 0.2); color: #c084fc; }
+    .phase-num.p3 { background: rgba(var(--accent-rgb), 0.15); color: var(--accent); }
+
+    .phase-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .phase-info .days {
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .phase-info p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── Stats Row ── */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: rgba(26, 31, 31, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 18px 12px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.3;
+    }
+
+    /* ── Breathing Animation ── */
+    .breathing-demo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .breathing-ring {
+      position: absolute;
+      border-radius: 50%;
+      animation: breathing 4s ease-in-out infinite;
+    }
+
+    .breathing-ring:nth-child(1) {
+      width: 140px;
+      height: 140px;
+      background: rgba(var(--primary-rgb), 0.05);
+      filter: blur(20px);
+    }
+
+    .breathing-ring:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      background: rgba(var(--primary-rgb), 0.1);
+      filter: blur(14px);
+      animation-delay: 0.2s;
+    }
+
+    .breathing-ring:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      border: 2px solid rgba(var(--primary-rgb), 0.3);
+      background: rgba(var(--primary-rgb), 0.05);
+      animation-delay: 0.4s;
+    }
+
+    .breathing-text {
+      position: relative;
+      z-index: 2;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.2em;
+    }
+
+    /* ── Anti-list ── */
+    .anti-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .anti-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .anti-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(var(--primary-rgb), 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .anti-text {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .anti-text .crossed {
+      text-decoration: line-through;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    /* ── Testimonial ── */
+    .testimonial {
+      font-size: 15px;
+      font-style: italic;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.85);
+      position: relative;
+      padding-left: 16px;
+      border-left: 2px solid rgba(var(--primary-rgb), 0.4);
+    }
+
+    .testimonial-author {
+      margin-top: 12px;
+      font-size: 12px;
+      font-style: normal;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── CTA Form Slide ── */
+    .form-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(26, 31, 31, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      color: var(--foreground);
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-input::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    .form-input:focus {
+      border-color: rgba(var(--primary-rgb), 0.4);
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.1);
+    }
+
+    .cta-button {
+      width: 100%;
+      padding: 18px 24px;
+      background: var(--primary);
+      color: var(--bg);
+      border: none;
+      border-radius: 16px;
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 40px rgba(var(--primary-rgb), 0.4);
+    }
+
+    .cta-button:active {
+      transform: scale(0.98);
+    }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* ── Progress Bar (top) ── */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      gap: 4px;
+      padding: 12px 16px 0;
+      background: linear-gradient(to bottom, rgba(15,18,18,0.9) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .progress-segment {
+      flex: 1;
+      height: 2.5px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .progress-segment.filled {
+      background: rgba(var(--primary-rgb), 0.7);
+    }
+
+    .progress-segment.current {
+      background: rgba(255,255,255,0.12);
+      position: relative;
+    }
+
+    .progress-segment.current::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 2px;
+      animation: progressFill 8s linear forwards;
+    }
+
+    /* ── Navigation Arrows ── */
+
+    /* ── Bottom Navigation Bar ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      padding: 0 24px 32px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .bottom-nav::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background: linear-gradient(to top, var(--bg) 40%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .next-button {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      padding: 18px 24px;
+      background: var(--primary);
+      color: var(--bg);
+      border: none;
+      border-radius: 16px;
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.3);
+      pointer-events: all;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .next-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 40px rgba(var(--primary-rgb), 0.4);
+    }
+
+    .next-button:active {
+      transform: scale(0.98);
+    }
+
+    .next-button svg {
+      transition: transform 0.2s;
+    }
+
+    .next-button:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* ── Animations ── */
+    @keyframes breathing {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+
+    @keyframes float-1 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(10px, -15px) scale(1.1); }
+    }
+
+    @keyframes float-2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-12px, 10px) scale(1.1); }
+    }
+
+    @keyframes float-3 {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes progressFill {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.3); }
+      50% { box-shadow: 0 8px 40px rgba(var(--primary-rgb), 0.5); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-height: 680px) {
+      .slide { padding: 50px 24px 80px; }
+      .emoji-large { font-size: 44px; }
+      .slide-title { font-size: 22px; }
+      .slide-content { gap: 14px; }
+    }
+
+    @media (min-width: 500px) {
+      .slide { padding: 60px 40px 100px; }
+    }
+
+    /* ── Selection prevention for swipe ── */
+    .carousel {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .form-input {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Bottom Navigation Button -->
+  <div class="bottom-nav">
+    <button class="next-button" id="nextButton">
+      <span id="nextButtonText">Дальше</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <!-- Carousel -->
+  <div class="carousel" id="carousel">
+    <div class="slides-track" id="slidesTrack">
+
+      <!-- ═══ Slide 1: Hook ═══ -->
+      <div class="slide" data-slide="0">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div class="slide-content">
+          <div class="emoji-large">🧠</div>
+          <h1 class="slide-title">
+            90% решений о еде<br>
+            принимаются <span class="accent">до того,<br>как вы это осознаёте</span>
+          </h1>
+          <p class="slide-text">
+            А что, если научиться ловить этот момент?
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 2: Problem ═══ -->
+      <div class="slide" data-slide="1">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="slide-content">
+          <div class="slide-label">Правда в том, что</div>
+          <h2 class="slide-title">
+            Эмоциональное переедание —<br>
+            <span class="warm">это не про еду</span>
+          </h2>
+          <p class="slide-text">
+            Это про эмоции, которые мы не умеем замечать вовремя.<br><br>
+            <strong>Между импульсом и действием есть пауза.</strong>
+            Мы научим вас её находить.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 3: What is Sati ═══ -->
+      <div class="slide" data-slide="2">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div class="slide-content">
+          <div class="slide-label">Знакомьтесь</div>
+          <h2 class="slide-title">
+            Sati — <span class="accent">заботливый<br>анти-трекер</span>
+          </h2>
+          <p class="slide-text">
+            14-дневный тренажёр осознанного питания в Telegram.
+            Не считает калории. Не стыдит. Не давит.
+          </p>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-num">14</div>
+              <div class="stat-label">дней<br>программа</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">3</div>
+              <div class="stat-label">касания<br>в день</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">5</div>
+              <div class="stat-label">минут<br>на подход</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 4: How it works ═══ -->
+      <div class="slide" data-slide="3">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="slide-content">
+          <div class="slide-label">Как это работает</div>
+          <h2 class="slide-title">3 микропрактики<br><span class="accent">каждый день</span></h2>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-marker morning">☀️</div>
+              <div class="timeline-text">
+                <h4>Утро</h4>
+                <p>Замечаете эмоцию. С чем просыпаетесь сегодня?</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker pause">💜</div>
+              <div class="timeline-text">
+                <h4>Пауза</h4>
+                <p>Дышите, сканируете тело, находите связь эмоций и голода</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker evening">🌙</div>
+              <div class="timeline-text">
+                <h4>Вечер</h4>
+                <p>Рефлексия. Что было? Что помогло? Что удивило?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 5: Breathing Demo ═══ -->
+      <div class="slide" data-slide="4">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div class="slide-content">
+          <div class="slide-label">Пауза начинается с</div>
+          <h2 class="slide-title">Одного <span class="accent">вдоха</span></h2>
+          <div class="breathing-demo">
+            <div class="breathing-ring"></div>
+            <div class="breathing-ring"></div>
+            <div class="breathing-ring"></div>
+            <span class="breathing-text">вдох</span>
+          </div>
+          <p class="slide-text">
+            Начнёте с 30 секунд: просто дышать. К 14-му дню дойдёте до минуты тишины.<br>
+            И удивитесь, сколько всего можно заметить, когда не спешишь.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 6: Features ═══ -->
+      <div class="slide" data-slide="5">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="slide-content">
+          <div class="slide-label">Инструменты</div>
+          <h2 class="slide-title">Что внутри <span class="accent">Sati</span></h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <span class="feature-icon">😌</span>
+              <span class="feature-title">Эмоции</span>
+              <span class="feature-desc">От 6 базовых до 30+ суб-эмоций</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">🫁</span>
+              <span class="feature-title">Тело</span>
+              <span class="feature-desc">Сканирование: где отзывается</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">💭</span>
+              <span class="feature-title">Мысли</span>
+              <span class="feature-desc">Автоматические убеждения</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">🎯</span>
+              <span class="feature-title">Потребности</span>
+              <span class="feature-desc">Что стоит за импульсом к еде</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 7: 3 Phases ═══ -->
+      <div class="slide" data-slide="6">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="slide-content">
+          <div class="slide-label">Путь</div>
+          <h2 class="slide-title">3 фазы<br><span class="accent">за 14 дней</span></h2>
+          <div class="phases">
+            <div class="phase-card">
+              <div class="phase-num p1">1</div>
+              <div class="phase-info">
+                <span class="days">Дни 1–4</span>
+                <h4>Калибровка</h4>
+                <p>Учимся замечать эмоции и связь с телом</p>
+              </div>
+            </div>
+            <div class="phase-card">
+              <div class="phase-num p2">2</div>
+              <div class="phase-info">
+                <span class="days">Дни 5–10</span>
+                <h4>Углубление</h4>
+                <p>Мысли, потребности, триггеры: понимаем связи</p>
+              </div>
+            </div>
+            <div class="phase-card">
+              <div class="phase-num p3">3</div>
+              <div class="phase-info">
+                <span class="days">Дни 11–14</span>
+                <h4>Интеграция</h4>
+                <p>Практикуете сами. Дашборд ваших паттернов</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 8: Anti-diet ═══ -->
+      <div class="slide" data-slide="7">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div class="slide-content">
+          <div class="slide-label">Философия</div>
+          <h2 class="slide-title">Мы — <span class="warm">антидиета</span></h2>
+          <div class="anti-list">
+            <div class="anti-item">
+              <div class="anti-icon">✕</div>
+              <span class="anti-text"><span class="crossed">Подсчёт калорий</span> → Осознанность</span>
+            </div>
+            <div class="anti-item">
+              <div class="anti-icon">✕</div>
+              <span class="anti-text"><span class="crossed">Чувство вины</span> → Любопытство</span>
+            </div>
+            <div class="anti-item">
+              <div class="anti-icon">✕</div>
+              <span class="anti-text"><span class="crossed">Жёсткие правила</span> → Мягкие наблюдения</span>
+            </div>
+            <div class="anti-item">
+              <div class="anti-icon">✕</div>
+              <span class="anti-text"><span class="crossed">«Сорвалась»</span> → «Заметила. Интересно»</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 9: Testimonial ═══ -->
+      <div class="slide" data-slide="8">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="slide-content">
+          <div class="emoji-large">💬</div>
+          <div class="glass">
+            <div class="testimonial">
+              «На третий день я впервые за годы остановилась перед холодильником и спросила себя: а я правда голодна? Оказалось, нет. Мне было одиноко. Это было как откровение.»
+              <div class="testimonial-author">— Участница тестирования, 34 года</div>
+            </div>
+          </div>
+          <p class="slide-text">
+            Sati не изменит вашу жизнь за ночь. Но за 14 дней вы начнёте <strong>замечать</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 10: What you'll discover ═══ -->
+      <div class="slide" data-slide="9">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="slide-content">
+          <div class="slide-label">За 14 дней</div>
+          <h2 class="slide-title">Вы <span class="accent">узнаете</span></h2>
+          <div class="glass" style="text-align: left;">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <span style="color: var(--primary); font-size: 16px; margin-top: 2px;">✦</span>
+                <span style="font-size: 14px; line-height: 1.5;">Какие эмоции чаще всего ведут вас к холодильнику</span>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <span style="color: var(--primary); font-size: 16px; margin-top: 2px;">✦</span>
+                <span style="font-size: 14px; line-height: 1.5;">В какой части тела живёт ваша тревога</span>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <span style="color: var(--primary); font-size: 16px; margin-top: 2px;">✦</span>
+                <span style="font-size: 14px; line-height: 1.5;">Какие автоматические мысли запускают переедание</span>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <span style="color: var(--primary); font-size: 16px; margin-top: 2px;">✦</span>
+                <span style="font-size: 14px; line-height: 1.5;">Какая потребность скрывается за импульсом к еде</span>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <span style="color: var(--primary); font-size: 16px; margin-top: 2px;">✦</span>
+                <span style="font-size: 14px; line-height: 1.5;">Как 60 секунд тишины меняют решение</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 11: How to start ═══ -->
+      <div class="slide" data-slide="10">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div class="slide-content">
+          <div class="slide-label">Просто</div>
+          <h2 class="slide-title">Начните<br><span class="accent">прямо сейчас</span></h2>
+          <p class="slide-text">
+            Тренажёр работает в Telegram. Бот будет рядом каждый день — утром, днём и вечером.
+          </p>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-marker morning">1</div>
+              <div class="timeline-text">
+                <h4>Откройте доступ к тренажёру</h4>
+                <p>После оплаты мы пришлём ссылку на бота</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker pause">2</div>
+              <div class="timeline-text">
+                <h4>Пройдите знакомство</h4>
+                <p>Установите время уведомлений, расскажите немного о себе — так мы подстроим тренажёр под вас</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker evening">3</div>
+              <div class="timeline-text">
+                <h4>Практикуйте 5 минут в день</h4>
+                <p>Возвращайтесь к боту, замечайте и собирайте знания о себе</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Slide 12: CTA Form ═══ -->
+      <div class="slide" data-slide="11">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+        <div class="slide-content">
+          <div class="emoji-large">🌿</div>
+          <h2 class="slide-title">
+            Между импульсом<br>и действием —<br>
+            <span class="accent">ваша пауза</span>
+          </h2>
+          <div class="form-container">
+            <input type="text" class="form-input" id="userName" placeholder="Ваше имя" autocomplete="given-name">
+            <input type="text" class="form-input" id="userTelegram" placeholder="@username в Telegram" autocomplete="username">
+            <button class="cta-button" id="ctaSubmit" style="animation: pulseGlow 3s ease-in-out infinite;">
+              Начать 14 дней →
+            </button>
+            <p class="form-note">
+              Бесплатно. Без карты. Без спама.<br>Только вы, бот и 5 минут в день.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const track = document.getElementById('slidesTrack');
+      const slides = document.querySelectorAll('.slide');
+      const totalSlides = slides.length;
+      let current = 0;
+      let startX = 0;
+      let deltaX = 0;
+      let isDragging = false;
+
+      // ── Progress Bar ──
+      const progressBar = document.getElementById('progressBar');
+      for (let i = 0; i < totalSlides; i++) {
+        const seg = document.createElement('div');
+        seg.className = 'progress-segment';
+        progressBar.appendChild(seg);
+      }
+
+      function updateProgress() {
+        const segments = progressBar.querySelectorAll('.progress-segment');
+        segments.forEach((seg, i) => {
+          seg.className = 'progress-segment';
+          if (i < current) seg.classList.add('filled');
+          if (i === current) seg.classList.add('current');
+        });
+      }
+
+      const nextBtn = document.getElementById('nextButton');
+      const nextBtnText = document.getElementById('nextButtonText');
+      const lastSlide = totalSlides - 1;
+
+      function updateButton() {
+        if (current === lastSlide) {
+          // Last slide has its own CTA, hide the nav button
+          nextBtn.parentElement.style.display = 'none';
+        } else if (current === lastSlide - 1) {
+          nextBtn.parentElement.style.display = 'flex';
+          nextBtnText.textContent = 'Дальше';
+        } else {
+          nextBtn.parentElement.style.display = 'flex';
+          nextBtnText.textContent = 'Дальше';
+        }
+      }
+
+      function goTo(index) {
+        if (index < 0 || index >= totalSlides) return;
+        current = index;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        updateProgress();
+        updateButton();
+      }
+
+      // ── Button navigation ──
+      nextBtn.addEventListener('click', () => goTo(current + 1));
+
+      // ── Tap to navigate (Instagram-style) ──
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.bottom-nav, .form-input, .cta-button')) return;
+        const x = e.clientX;
+        const w = window.innerWidth;
+        if (x < w * 0.3 && current > 0) goTo(current - 1);
+        if (x > w * 0.7) goTo(current + 1);
+      });
+
+      // ── Keyboard navigation ──
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+      });
+
+      // ── Touch swipe ──
+      track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        track.classList.add('dragging');
+      }, { passive: true });
+
+      track.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        deltaX = e.touches[0].clientX - startX;
+        const base = -current * window.innerWidth;
+        track.style.transform = `translateX(${base + deltaX}px)`;
+      }, { passive: true });
+
+      track.addEventListener('touchend', () => {
+        isDragging = false;
+        track.classList.remove('dragging');
+        if (Math.abs(deltaX) > 50) {
+          goTo(deltaX < 0 ? current + 1 : current - 1);
+        } else {
+          goTo(current);
+        }
+        deltaX = 0;
+      });
+
+      // ── Form submit ──
+      document.getElementById('ctaSubmit').addEventListener('click', () => {
+        const name = document.getElementById('userName').value.trim();
+        const tg = document.getElementById('userTelegram').value.trim();
+        if (!name || !tg) {
+          const empty = !name ? document.getElementById('userName') : document.getElementById('userTelegram');
+          empty.style.borderColor = 'rgba(255, 107, 53, 0.6)';
+          empty.style.boxShadow = '0 0 20px rgba(255, 107, 53, 0.15)';
+          empty.focus();
+          setTimeout(() => {
+            empty.style.borderColor = '';
+            empty.style.boxShadow = '';
+          }, 2000);
+          return;
+        }
+        // TODO: Replace with actual form submission (webhook, etc.)
+        const btn = document.getElementById('ctaSubmit');
+        btn.textContent = '✓ Отправлено!';
+        btn.style.background = '#29D6B6';
+        btn.style.animation = 'none';
+        btn.disabled = true;
+        console.log('Form submitted:', { name, telegram: tg });
+      });
+
+      // Init
+      updateProgress();
+      updateButton();
+    })();
+  </script>
+
+</body>
+</html>
