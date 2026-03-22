@@ -1066,12 +1066,24 @@
         }
       }
 
+      // ── Auto-advance timer (Instagram-style) ──
+      const SLIDE_DURATION = 8000; // ms, matches CSS progressFill animation
+      let autoTimer = null;
+
+      function startAutoAdvance() {
+        clearTimeout(autoTimer);
+        if (current < lastSlide) {
+          autoTimer = setTimeout(() => goTo(current + 1), SLIDE_DURATION);
+        }
+      }
+
       function goTo(index) {
         if (index < 0 || index >= totalSlides) return;
         current = index;
         track.style.transform = `translateX(-${current * 100}%)`;
         updateProgress();
         updateButton();
+        startAutoAdvance();
       }
 
       // ── Button navigation ──
@@ -1117,33 +1129,10 @@
         deltaX = 0;
       });
 
-      // ── Form submit ──
-      document.getElementById('ctaSubmit').addEventListener('click', () => {
-        const name = document.getElementById('userName').value.trim();
-        const tg = document.getElementById('userTelegram').value.trim();
-        if (!name || !tg) {
-          const empty = !name ? document.getElementById('userName') : document.getElementById('userTelegram');
-          empty.style.borderColor = 'rgba(255, 107, 53, 0.6)';
-          empty.style.boxShadow = '0 0 20px rgba(255, 107, 53, 0.15)';
-          empty.focus();
-          setTimeout(() => {
-            empty.style.borderColor = '';
-            empty.style.boxShadow = '';
-          }, 2000);
-          return;
-        }
-        // TODO: Replace with actual form submission (webhook, etc.)
-        const btn = document.getElementById('ctaSubmit');
-        btn.textContent = '✓ Отправлено!';
-        btn.style.background = '#29D6B6';
-        btn.style.animation = 'none';
-        btn.disabled = true;
-        console.log('Form submitted:', { name, telegram: tg });
-      });
-
       // Init
       updateProgress();
       updateButton();
+      startAutoAdvance();
     })();
   </script>
 
